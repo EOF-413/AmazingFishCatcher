@@ -161,7 +161,6 @@ $RECYCLE.BIN/
 .directory
 
 # Project specific
-templates/*.png
 !templates/.gitkeep
 *.log
 *.tmp
