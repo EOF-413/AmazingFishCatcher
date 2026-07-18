@@ -3,7 +3,7 @@ import sys
 import subprocess
 
 print("=" * 50)
-print("AmazingAutoHotkeys - Сборка .exe")
+print("AmazingStreetCleaner - Сборка .exe")
 print("=" * 50)
 
 for folder in ['dist', 'build']:
@@ -17,7 +17,7 @@ cmd = [
     sys.executable, '-m', 'PyInstaller',
     '--onefile',
     '--noconsole',
-    '--name=AmazingAutoHotkeys',
+    '--name=AmazingStreetCleaner',
     '--add-data=templates;templates',
     '--hidden-import=PyQt5',
     '--hidden-import=cv2',
@@ -36,11 +36,11 @@ if os.path.exists('icon.ico'):
 subprocess.run(cmd)
 
 print("\n" + "=" * 50)
-if os.path.exists('dist/AmazingAutoHotkeys.exe'):
-    size = os.path.getsize('dist/AmazingAutoHotkeys.exe') / (1024 * 1024)
+if os.path.exists('dist/AmazingStreetCleaner.exe'):
+    size = os.path.getsize('dist/AmazingStreetCleaner.exe') / (1024 * 1024)
     print("✅ Сборка завершена!")
     print(f"📁 Размер: {size:.2f} MB")
-    print("📁 dist/AmazingAutoHotkeys.exe")
+    print("📁 dist/AmazingStreetCleaner.exe")
 else:
     print("❌ Сборка не удалась")
 print("=" * 50)
