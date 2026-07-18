@@ -6,7 +6,6 @@
 [![Python](https://img.shields.io/badge/python-3.11.0-yellow.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Windows](https://img.shields.io/badge/platform-Windows-blue.svg)](https://www.microsoft.com/windows)
-[![Linux](https://img.shields.io/badge/platform-Linux-purple.svg)](https://www.microsoft.com/windows)
 
 **Автоматическое нажатие клавиш по шаблонам на экране**
 
