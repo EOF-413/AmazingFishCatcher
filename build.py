@@ -16,7 +16,7 @@ print("[BUILD] Запуск сборки...")
 cmd = [
     sys.executable, '-m', 'PyInstaller',
     '--onefile',
-    '--console',
+    '--noconsole',
     '--name=AmazingAutoHotkeys',
     '--add-data=templates;templates',
     '--hidden-import=PyQt5',
