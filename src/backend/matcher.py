@@ -21,8 +21,8 @@ class Matcher:
         templates = {}
         for key in KEYS:
             try:
-                path = resource_path(f'templates/{key}.png')
-                img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+                fpath = os.path.join('templates/', f'{key}.png')
+                img = cv2.imread(fpath, cv2.IMREAD_GRAYSCALE)
                 if img is not None:
                     templates[key] = img
             except Exception:
