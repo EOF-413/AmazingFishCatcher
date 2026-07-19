@@ -1,5 +1,5 @@
 @echo off
-title AmazingStreetCleaner v3.0.0
+title AmazingStreetCleaner v3.0.1
 echo Starting AmazingStreetCleaner...
 echo.
 "ASC.exe"

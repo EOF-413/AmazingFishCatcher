@@ -57,7 +57,7 @@ except subprocess.CalledProcessError as e:
 
 print("\n[2/4] Копирование файлов...")
 
-INSTALL_DIR = os.path.join(BASE_DIR, 'installer_files')
+INSTALL_DIR = os.path.join(BASE_DIR, 'files')
 if os.path.exists(INSTALL_DIR):
     shutil.rmtree(INSTALL_DIR)
 os.makedirs(INSTALL_DIR)
