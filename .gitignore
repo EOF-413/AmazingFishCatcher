@@ -35,6 +35,7 @@ build/
 *.spec
 dist/
 build/
+filess/
 
 # Logs
 logs/
