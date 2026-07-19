@@ -18,7 +18,7 @@ for folder in ['dist', 'build']:
 
 cmd = [
     sys.executable, '-m', 'PyInstaller',
-    '--console',
+    '--noconsole',
     '--onedir',
     '--noupx',
     '--strip',
@@ -49,7 +49,7 @@ if os.path.exists(src_templates):
     if os.path.exists(dst_templates):
         shutil.rmtree(dst_templates)
     shutil.copytree(src_templates, dst_templates)
-    print(f"[OK] Папка templates скопирована")
+    print("[OK] Папка templates скопирована")
 
 dist_dir = os.path.join(BASE_DIR, 'dist', APP_NAME)
 exe_path = os.path.join(BASE_DIR, 'dist', f'{APP_NAME}.exe')
