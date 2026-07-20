@@ -1,12 +1,13 @@
-from datetime import datetime
 import os
 import sys
+from datetime import datetime
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor, QTextCharFormat, QTextCursor, QIcon
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
-    QLabel, QPushButton, QTextEdit, QGroupBox, QTabWidget
+    QLabel, QPushButton, QTextEdit, QGroupBox, QTabWidget,
+    QSystemTrayIcon, QMenu, QAction
 )
 
 from src.config import load_config, VER, APP_FULL_NAME
@@ -86,16 +87,25 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.app = app
         self.config = load_config()
+        self.tray_icon = None
+        self.tray_menu = None
+        self._closing = False
+        self._toggle_lock = False
+        self._last_toggle_time = 0
 
-        self.setWindowTitle(f"{APP_FULL_NAME}")
-        self.resize(500, 550)
-        self.setMinimumSize(300, 350)
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.setWindowTitle(APP_FULL_NAME)
+        self.resize(400, 500)
+        self.setMinimumSize(300, 500)
+
+        if self.config.get("ALWAYS_ON_TOP", True):
+            self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         icon_path = resource_path('icon.ico')
         if os.path.exists(icon_path):
             try:
-                self.setWindowIcon(QIcon(icon_path))
+                icon = QIcon(icon_path)
+                self.setWindowIcon(icon)
+                self._create_tray_icon(icon)
             except Exception:
                 pass
 
@@ -173,7 +183,7 @@ class MainWindow(QMainWindow):
         header_layout.setSpacing(0)
         header_layout.setContentsMargins(0, 0, 0, 10)
 
-        title = QLabel(f"{APP_FULL_NAME}")
+        title = QLabel(APP_FULL_NAME)
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 18px; font-weight: bold; color: #ffffff;")
         header_layout.addWidget(title)
@@ -192,7 +202,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabs)
 
         self.start_btn = QPushButton("СТАРТ")
-        self.start_btn.clicked.connect(self.toggle)
+        self.start_btn.clicked.connect(self._on_start_click)
         self.start_btn.setFixedWidth(180)
         self.start_btn.setFixedHeight(40)
 
@@ -204,22 +214,97 @@ class MainWindow(QMainWindow):
         self.append_text.connect(self._append_text_slot)
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self._update_config)
-        self.timer.start(1000)
+        self.timer.timeout.connect(self._auto_save_settings)
+        self.timer.start(2000)
 
         self.app.start_listener()
+        self.app.gui = self
+
+    def _auto_save_settings(self):
+        if self.settings_tab:
+            self.settings_tab.save_settings()
+
+    def _create_tray_icon(self, icon):
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(icon)
+
+        self.tray_menu = QMenu()
+
+        show_action = QAction("Показать", self)
+        show_action.triggered.connect(self.show)
+        self.tray_menu.addAction(show_action)
+
+        self.tray_menu.addSeparator()
+
+        toggle_action = QAction("Старт/Стоп", self)
+        toggle_action.triggered.connect(self._on_tray_toggle)
+        self.tray_menu.addAction(toggle_action)
+
+        self.tray_menu.addSeparator()
+
+        quit_action = QAction("Выход", self)
+        quit_action.triggered.connect(self._quit_application)
+        self.tray_menu.addAction(quit_action)
+
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.activated.connect(self._tray_icon_activated)
+        self.tray_icon.show()
+
+    def _tray_icon_activated(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            if self.isVisible():
+                self.hide()
+            else:
+                self.show()
+                self.raise_()
+                self.activateWindow()
+
+    def _quit_application(self):
+        if self._closing:
+            return
+        self._closing = True
+
+        if self.settings_tab:
+            self.settings_tab.save_settings()
+
+        self.app.cleanup()
+        if self.tray_icon:
+            self.tray_icon.hide()
+        QApplication.quit()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_F9:
+        if event.key() == Qt.Key_F9 and not event.isAutoRepeat():
+            self._on_toggle()
             event.accept()
             return
         super().keyPressEvent(event)
 
+    def _on_start_click(self):
+        self._on_toggle()
+
+    def _on_tray_toggle(self):
+        self._on_toggle()
+
+    def _on_toggle(self):
+        import time
+        current_time = time.time()
+        if self._toggle_lock or (current_time - self._last_toggle_time) < 0.5:
+            return
+
+        self._toggle_lock = True
+        self._last_toggle_time = current_time
+
+        try:
+            self.app.toggle()
+            self.update_status()
+            self._update_fields_state()
+        except Exception as e:
+            self.log(f"Ошибка при переключении: {e}", 'error')
+        finally:
+            self._toggle_lock = False
+
     def _append_text_slot(self, text, tag):
         self.log_area.append_colored(text, tag)
-
-    def _update_config(self):
-        self.settings_tab.update_config()
 
     def _create_main_tab(self):
         tab = QWidget()
@@ -246,23 +331,15 @@ class MainWindow(QMainWindow):
     def log_error(self, message):
         self.log(message, 'error')
 
-    def toggle(self):
-        try:
-            self.app.toggle()
-            self.update_status()
-            self._update_fields_state()
-        except Exception:
-            pass
-
     def update_status(self):
         if self.app.enabled:
             self.start_btn.setText("СТОП")
             self.start_btn.setObjectName("stop_btn")
-            self.start_btn.setStyleSheet(self.start_btn.styleSheet())
         else:
             self.start_btn.setText("СТАРТ")
             self.start_btn.setObjectName("")
-            self.start_btn.setStyleSheet(self.start_btn.styleSheet())
+        self.start_btn.style().unpolish(self.start_btn)
+        self.start_btn.style().polish(self.start_btn)
 
     def _update_fields_state(self):
         enabled = not self.app.enabled
@@ -270,8 +347,43 @@ class MainWindow(QMainWindow):
         self.tabs.setTabEnabled(1, enabled)
 
     def closeEvent(self, event):
+        if self._closing:
+            event.accept()
+            return
+
+        if self.settings_tab:
+            self.settings_tab.save_settings()
+
+        self.config = load_config()
+
+        if self.config.get("MINIMIZE_TO_TRAY", False):
+            if self.tray_icon and self.tray_icon.isVisible():
+                self.hide()
+                if self.tray_icon:
+                    self.tray_icon.showMessage(
+                        APP_FULL_NAME,
+                        "Приложение свернуто в трей",
+                        QSystemTrayIcon.Information,
+                        2000
+                    )
+                event.ignore()
+                return
+            else:
+                self.showMinimized()
+                event.ignore()
+                return
+
+        self._closing = True
         try:
             self.app.cleanup()
+            if self.tray_icon:
+                self.tray_icon.hide()
         except Exception:
             pass
         event.accept()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+    def show(self):
+        super().show()
