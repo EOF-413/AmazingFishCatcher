@@ -1,14 +1,25 @@
 import cv2
 from pathlib import Path
+import sys
+import os
 
 from src.config import load_config
+
+
+def get_resource_path(relative_path):
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    return os.path.join(base_path, relative_path)
 
 
 class KeyMatcher:
     def __init__(self):
         config = load_config()
         self.threshold = config.get("MIN_KEY_MATCH", 0.40)
-        self.keys_folder = Path("Keys")
+        self.keys_folder = Path(get_resource_path("Keys"))
         self.keys_cache = {}
         self.templates = {}
         self._load_keys()
@@ -85,7 +96,7 @@ class FishMatcher:
     def __init__(self):
         config = load_config()
         self.threshold = config.get("MIN_ICON_MATCH", 0.70)
-        self.fishs_folder = Path("Fishs")
+        self.fishs_folder = Path(get_resource_path("Fishs"))
         self.fishs_cache = {}
         self.templates = {}
         self._load_fishs()
@@ -143,19 +154,16 @@ class FishMatcher:
         try:
             best_score = 0.0
 
-            h_area, w_area = area_image.shape
-            h_template, w_template = template.shape
-
             scales = [0.3, 0.4, 0.5, 0.6]
 
             for scale in scales:
-                new_w = int(w_template * scale)
-                new_h = int(h_template * scale)
+                new_w = int(template.shape[1] * scale)
+                new_h = int(template.shape[0] * scale)
 
                 if new_w < 10 or new_h < 10:
                     continue
 
-                if new_w > w_area or new_h > h_area:
+                if new_w > area_image.shape[1] or new_h > area_image.shape[0]:
                     continue
 
                 template_scaled = cv2.resize(template, (new_w, new_h))

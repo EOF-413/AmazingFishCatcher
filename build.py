@@ -32,6 +32,8 @@ cmd = [
     '--collect-all', 'numpy',
     '--collect-all', 'cv2',
     '--collect-all', 'PyQt5',
+    '--add-data', f'Keys{os.pathsep}Keys',
+    '--add-data', f'Fishs{os.pathsep}Fishs',
     '--paths', BASE_DIR,
     '--paths', os.path.join(BASE_DIR, 'src'),
     f'--name={APP_NAME}',
