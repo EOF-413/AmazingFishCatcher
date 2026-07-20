@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QGridLayout,
     QLabel, QLineEdit, QPushButton, QGroupBox,
-    QMessageBox, QCheckBox
+    QMessageBox, QCheckBox, QSlider
 )
 
 from src.config import load_config, save_config, DEFAULT_CONFIG, APP_FULL_NAME
@@ -80,6 +80,26 @@ class SettingsTab(QWidget):
                 border: 1px solid #0078d4;
                 border-radius: 3px;
             }
+            QSlider::groove:horizontal {
+                border: 1px solid #3d3d3d;
+                height: 6px;
+                background: #2a2a2a;
+                border-radius: 3px;
+            }
+            QSlider::handle:horizontal {
+                background: #0078d4;
+                border: 1px solid #0078d4;
+                width: 18px;
+                margin: -6px 0;
+                border-radius: 9px;
+            }
+            QSlider::handle:horizontal:hover {
+                background: #1a8ad4;
+            }
+            QSlider::sub-page:horizontal {
+                background: #0078d4;
+                border-radius: 3px;
+            }
         """)
 
         capture_group = QGroupBox("Параметры захвата")
@@ -88,7 +108,6 @@ class SettingsTab(QWidget):
         capture_layout.setHorizontalSpacing(15)
 
         label_hold = QLabel("Время удержания (сек):")
-        label_hold.setStyleSheet("color: #ffffff;")
         capture_layout.addWidget(label_hold, 0, 0)
 
         self.hold_edit = QLineEdit(str(self.config["HOLD"]))
@@ -96,23 +115,50 @@ class SettingsTab(QWidget):
         capture_layout.addWidget(self.hold_edit, 0, 1)
 
         label_cooldown = QLabel("Задержка между кадрами (сек):")
-        label_cooldown.setStyleSheet("color: #ffffff;")
         capture_layout.addWidget(label_cooldown, 1, 0)
 
         self.cooldown_edit = QLineEdit(str(self.config["COOLDOWN"]))
         self.cooldown_edit.setFixedWidth(80)
         capture_layout.addWidget(self.cooldown_edit, 1, 1)
 
-        label_match = QLabel("Порог совпадения (0.1-0.9):")
-        label_match.setStyleSheet("color: #ffffff;")
-        capture_layout.addWidget(label_match, 2, 0)
-
-        self.min_match_edit = QLineEdit(str(self.config["MIN_MATCH"]))
-        self.min_match_edit.setFixedWidth(80)
-        capture_layout.addWidget(self.min_match_edit, 2, 1)
-
         capture_group.setLayout(capture_layout)
         layout.addWidget(capture_group)
+
+        match_group = QGroupBox("Пороги совпадения")
+        match_layout = QGridLayout()
+        match_layout.setSpacing(10)
+        match_layout.setHorizontalSpacing(15)
+
+        label_key_match = QLabel("Клавиши (%):")
+        match_layout.addWidget(label_key_match, 0, 0)
+
+        self.key_match_slider = QSlider(Qt.Horizontal)
+        self.key_match_slider.setRange(10, 90)
+        self.key_match_slider.setValue(int(self.config["MIN_KEY_MATCH"] * 100))
+        self.key_match_slider.setFixedWidth(150)
+        self.key_match_slider.valueChanged.connect(self._on_key_match_changed)
+        match_layout.addWidget(self.key_match_slider, 0, 1)
+
+        self.key_match_label = QLabel(f"{self.config['MIN_KEY_MATCH'] * 100:.0f}%")
+        self.key_match_label.setFixedWidth(40)
+        match_layout.addWidget(self.key_match_label, 0, 2)
+
+        label_fish_match = QLabel("Рыбки (%):")
+        match_layout.addWidget(label_fish_match, 1, 0)
+
+        self.fish_match_slider = QSlider(Qt.Horizontal)
+        self.fish_match_slider.setRange(10, 90)
+        self.fish_match_slider.setValue(int(self.config["MIN_ICON_MATCH"] * 100))
+        self.fish_match_slider.setFixedWidth(150)
+        self.fish_match_slider.valueChanged.connect(self._on_fish_match_changed)
+        match_layout.addWidget(self.fish_match_slider, 1, 1)
+
+        self.fish_match_label = QLabel(f"{self.config['MIN_ICON_MATCH'] * 100:.0f}%")
+        self.fish_match_label.setFixedWidth(40)
+        match_layout.addWidget(self.fish_match_label, 1, 2)
+
+        match_group.setLayout(match_layout)
+        layout.addWidget(match_group)
 
         window_group = QGroupBox("Настройки окна")
         window_layout = QVBoxLayout()
@@ -163,6 +209,20 @@ class SettingsTab(QWidget):
 
         layout.addWidget(reset_btn, alignment=Qt.AlignCenter)
         layout.addStretch()
+
+    def _on_key_match_changed(self, value):
+        self.key_match_label.setText(f"{value}%")
+        self.config["MIN_KEY_MATCH"] = value / 100.0
+        save_config(self.config)
+        if self.parent_window:
+            self.parent_window.config = load_config()
+
+    def _on_fish_match_changed(self, value):
+        self.fish_match_label.setText(f"{value}%")
+        self.config["MIN_ICON_MATCH"] = value / 100.0
+        save_config(self.config)
+        if self.parent_window:
+            self.parent_window.config = load_config()
 
     def _is_autostart_enabled(self):
         try:
@@ -215,12 +275,12 @@ class SettingsTab(QWidget):
     def _on_checkbox_changed(self):
         self.config["ALWAYS_ON_TOP"] = self.top_checkbox.isChecked()
         self.config["MINIMIZE_TO_TRAY"] = self.tray_checkbox.isChecked()
-        
+
         save_config(self.config)
-        
+
         if self.parent_window:
             self.parent_window.config = load_config()
-            
+
             if self.config["ALWAYS_ON_TOP"]:
                 self.parent_window.setWindowFlags(
                     self.parent_window.windowFlags() | Qt.WindowStaysOnTopHint
@@ -279,7 +339,13 @@ class SettingsTab(QWidget):
 
             self.hold_edit.setText(str(self.config["HOLD"]))
             self.cooldown_edit.setText(str(self.config["COOLDOWN"]))
-            self.min_match_edit.setText(str(self.config["MIN_MATCH"]))
+
+            self.key_match_slider.setValue(int(self.config["MIN_KEY_MATCH"] * 100))
+            self.key_match_label.setText(f"{self.config['MIN_KEY_MATCH'] * 100:.0f}%")
+
+            self.fish_match_slider.setValue(int(self.config["MIN_ICON_MATCH"] * 100))
+            self.fish_match_label.setText(f"{self.config['MIN_ICON_MATCH'] * 100:.0f}%")
+
             self.top_checkbox.setChecked(self.config["ALWAYS_ON_TOP"])
             self.tray_checkbox.setChecked(self.config["MINIMIZE_TO_TRAY"])
 
@@ -292,7 +358,6 @@ class SettingsTab(QWidget):
             return {
                 "HOLD": float(self.hold_edit.text()),
                 "COOLDOWN": float(self.cooldown_edit.text()),
-                "MIN_MATCH": float(self.min_match_edit.text())
             }
         except ValueError:
             return None
@@ -308,10 +373,7 @@ class SettingsTab(QWidget):
                 if key == "HOLD" and 0.1 <= val <= 3.0:
                     self.config[key] = val
                     changed = True
-                elif key == "COOLDOWN" and 0.1 <= val <= 2.0:
-                    self.config[key] = val
-                    changed = True
-                elif key == "MIN_MATCH" and 0.1 <= val <= 0.9:
+                elif key == "COOLDOWN" and 0.01 <= val <= 2.0:
                     self.config[key] = val
                     changed = True
 
@@ -326,7 +388,8 @@ class SettingsTab(QWidget):
     def set_enabled(self, enabled):
         self.hold_edit.setEnabled(enabled)
         self.cooldown_edit.setEnabled(enabled)
-        self.min_match_edit.setEnabled(enabled)
+        self.key_match_slider.setEnabled(enabled)
+        self.fish_match_slider.setEnabled(enabled)
         self.top_checkbox.setEnabled(enabled)
         self.auto_start_checkbox.setEnabled(enabled)
         self.tray_checkbox.setEnabled(enabled)

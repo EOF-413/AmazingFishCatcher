@@ -1,8 +1,8 @@
-# 🚀 AmazingStreetCleaner
+# 🚀 Amazing Fish Catcher
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/EOF-413/AmazingStreetCleaner)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/EOF-413/AmazingStreetCleaner)
 [![Python](https://img.shields.io/badge/python-3.11.0-yellow.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Windows](https://img.shields.io/badge/platform-Windows-blue.svg)](https://www.microsoft.com/windows)
@@ -15,7 +15,7 @@
 
 ## 📋 Описание
 
-AmazingStreetCleaner - программа для автоматического нажатия клавиш на основе распознавания шаблонов на экране. Создана для удобной работы на проекте AMAZING ONLINE, где требуется автоматизация повторяющихся действий.
+Amazing Fish Catcher - программа для автоматического нажатия клавиш на основе распознавания шаблонов на экране. Создана для удобной работы на проекте AMAZING ONLINE, где требуется автоматизация повторяющихся действий.
 
 ### ✨ Возможности
 
@@ -24,7 +24,7 @@ AmazingStreetCleaner - программа для автоматического 
 - ⚡ **Высокая производительность** - оптимизированная работа с процессором
 - 🎨 **Современный интерфейс** - тёмная тема на PyQt5
 - 🔧 **Гибкие настройки** - все параметры можно менять в реальном времени
-- 💾 **Сохранение настроек** - конфиг хранится в `%AppData%/EOF-413/ASC`
+- 💾 **Сохранение настроек** - конфиг хранится в `%AppData%/EOF-413/AFC`
 - 🖥️ **Глобальный хоткей** - F9 для старта/остановки
 - 📊 **Логирование** - цветовой лог для отслеживания действий
 
@@ -34,7 +34,7 @@ AmazingStreetCleaner - программа для автоматического 
 
 ### Способ 1: Установка из установщика (рекомендуется)
 
-1. Скачайте установщик `ASC.exe`
+1. Скачайте установщик `AFC.exe`
 2. Запустите установщик и следуйте инструкциям
 3. Запустите программу через ярлык на рабочем столе или в меню Пуск
 
@@ -42,10 +42,10 @@ AmazingStreetCleaner - программа для автоматического 
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/EOF-413/AmazingStreetCleaner.git
+git clone https://github.com/EOF-413/AmazingFishCatcher.git
 
 # Вход в каталог
-cd AmazingStreetCleaner
+cd AmazingFishCatcher
 
 # Создание виртуального окружения
 python -m venv venv

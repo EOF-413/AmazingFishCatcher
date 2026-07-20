@@ -94,8 +94,8 @@ class MainWindow(QMainWindow):
         self._last_toggle_time = 0
 
         self.setWindowTitle(APP_FULL_NAME)
-        self.resize(400, 500)
-        self.setMinimumSize(300, 500)
+        self.resize(400, 600)
+        self.setMinimumSize(400, 600)
 
         if self.config.get("ALWAYS_ON_TOP", True):
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)

@@ -1,48 +1,36 @@
 from time import sleep
 from pynput.keyboard import Key, Controller
+from src.config import DEF, DIG
 
 keyboard = Controller()
 
-VK_TO_PYNPUT = {
-    'A': 'a',
-    'C': 'c',
-    'D': 'd',
-    'E': 'e',
-    'J': 'j',
-    'K': 'k',
-    'L': 'l',
-    'N': 'n',
-    'Q': 'q',
-    'R': 'r',
-    'S': 's',
-    'W': 'w',
-    'SHIFT': Key.shift,
-    'CTRL': Key.ctrl,
-    'ALT': Key.alt
+dig = {
+    'shift': Key.shift,
+    'ctrl': Key.ctrl,
+    'space': Key.space
 }
-
-MODIFIERS = ['SHIFT', 'CTRL', 'ALT']
 
 
 def press_key(key, hold):
-    try:
-        if key in MODIFIERS:
-            keyboard.press(VK_TO_PYNPUT[key])
-            sleep(hold)
-            keyboard.release(VK_TO_PYNPUT[key])
-        else:
-            keyboard.press(key.lower())
-            sleep(hold)
-            keyboard.release(key.lower())
-    except Exception:
-        pass
+    key = key.lower()
+
+    if key in dig:
+        keyboard.press(dig[key])
+        sleep(hold)
+        keyboard.release(dig[key])
+    else:
+        keyboard.press(key)
+        sleep(hold)
+        keyboard.release(key)
 
 
 def release_all():
-    try:
-        for key in MODIFIERS:
-            keyboard.release(VK_TO_PYNPUT[key])
-        for key in ['A', 'C', 'D', 'E', 'J', 'K', 'L', 'N', 'Q', 'R', 'S', 'W']:
+    for key in DIG:
+        if key.lower() in dig:
+            keyboard.release(dig[key.lower()])
+
+    for key in DEF:
+        try:
             keyboard.release(key.lower())
-    except Exception:
-        pass
+        except ValueError:
+            pass

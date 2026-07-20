@@ -1,21 +1,21 @@
 import os
 import json
 
-VER = "3.1.0"
-APP_NAME = "ASC"
-APP_FULL_NAME = "Amazing Street Cleaner"
+VER = "1.0.1"
+APP_NAME = "AFC"
+APP_FULL_NAME = "Amazing Fish Catcher"
 
-X1_RATIO = 0.4427
-Y1_RATIO = 0.6944
-X2_RATIO = 0.5547
-Y2_RATIO = 0.8102
+FISH_REGION = (945, 950, 35, 35)
+KEY_REGION = (935, 875, 70, 20)
 
-KEYS = ['SHIFT', 'CTRL', 'ALT', 'A', 'C', 'D', 'E', 'J', 'K', 'L', 'N', 'Q', 'R', 'S', 'W']
+DIG = ['SHIFT', 'CTRL', 'SPACE']
+DEF = ['D', 'S', 'W', 'V', 'C']
 
 DEFAULT_CONFIG = {
-    "HOLD": 1.25,
-    "COOLDOWN": 0.75,
-    "MIN_MATCH": 0.40,
+    "HOLD": 0.1,
+    "COOLDOWN": 0.01,
+    "MIN_KEY_MATCH": 0.60,
+    "MIN_ICON_MATCH": 0.70,
     "ALWAYS_ON_TOP": True,
     "AUTO_START": True,
     "MINIMIZE_TO_TRAY": False,

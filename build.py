@@ -1,8 +1,7 @@
 import os
 import sys
-import subprocess
 import shutil
-
+import subprocess
 from src.config import VER, APP_NAME, APP_FULL_NAME
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +32,7 @@ cmd = [
     '--collect-all', 'numpy',
     '--collect-all', 'cv2',
     '--collect-all', 'PyQt5',
+    '--paths', BASE_DIR,
     '--paths', os.path.join(BASE_DIR, 'src'),
     f'--name={APP_NAME}',
     'main.py'
