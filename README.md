@@ -2,9 +2,9 @@
 
 <div align="center">
 
+[![Version](https://img.shields.io/badge/version-1.0.2-purple.svg)](https://github.com/EOF-413/AmazingStreetCleaner)
 [![Python](https://img.shields.io/badge/python-3.11.0-yellow.svg)](https://www.python.org/)
 [![Windows](https://img.shields.io/badge/platform-Windows-blue.svg)](https://www.microsoft.com/windows)
-[![Version](https://img.shields.io/badge/version-1.0.2-purple.svg)](https://github.com/EOF-413/AmazingStreetCleaner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 </div>
