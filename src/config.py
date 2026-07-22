@@ -24,7 +24,7 @@ DEFAULT_CONFIG = {
 
 def get_config_path():
     app_data = os.getenv('APPDATA')
-    config_dir = os.path.join(app_data, 'EOF-413', APP_NAME)
+    config_dir = os.path.join(app_data, 'EOF413', APP_NAME)
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
     return os.path.join(config_dir, 'config.json')
